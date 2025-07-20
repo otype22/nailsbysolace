@@ -1,15 +1,20 @@
-import  { useState } from 'react';
-import { Menu, X, Phone, ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
+import { Menu, X, Phone, ShoppingCart, ChevronDown } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import CheckoutModal from './CheckoutModal';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const { state, dispatch } = useCart();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const toggleCategories = () => {
+    setIsCategoriesOpen(!isCategoriesOpen);
   };
 
   const handleCartClick = () => {
@@ -19,6 +24,15 @@ const Header = () => {
       dispatch({ type: 'TOGGLE_CART' });
     }
   };
+
+  // Product categories data
+  const categories = [
+    { name: "Gel Polish", href: "#gel-polish" },
+    { name: "Nail Art", href: "#nail-art" },
+    { name: "Nail Tools", href: "#nail-tools" },
+    { name: "Nail Care", href: "#nail-care" },
+    { name: "Nail Kits", href: "#nail-kits" }
+  ];
 
   return (
     <>
@@ -31,12 +45,37 @@ const Header = () => {
               </div>
             </div>
             
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex space-x-8 items-center">
               <a href="#home" className="text-gray-700 hover:text-pink-600 transition-colors">Home</a>
+              
+              {/* Categories Dropdown */}
+              <div className="relative group">
+                <button 
+                  onClick={toggleCategories}
+                  className="flex items-center text-gray-700 hover:text-pink-600 transition-colors"
+                >
+                  <span>Categories</span>
+                  <ChevronDown className={`h-4 w-4 ml-1 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                <div 
+                  className={`absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 ${isCategoriesOpen ? 'block' : 'hidden'}`}
+                >
+                  {categories.map((category) => (
+                    <a
+                      key={category.href}
+                      href={category.href}
+                      className="block px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-600"
+                    >
+                      {category.name}
+                    </a>
+                  ))}
+                </div>
+              </div>
+              
               <a href="#products" className="text-gray-700 hover:text-pink-600 transition-colors">Products</a>
               <a href="#about" className="text-gray-700 hover:text-pink-600 transition-colors">About</a>
               <a href="#gallery" className="text-gray-700 hover:text-pink-600 transition-colors">Gallery</a>
-             
               <a href="#contact" className="text-gray-700 hover:text-pink-600 transition-colors">Contact</a>
             </nav>
 
@@ -83,6 +122,32 @@ const Header = () => {
             <div className="md:hidden">
               <nav className="py-4 space-y-2">
                 <a href="#home" className="block py-2 text-gray-700 hover:text-pink-600 transition-colors">Home</a>
+                
+                {/* Mobile Categories Dropdown */}
+                <div className="relative">
+                  <button 
+                    onClick={toggleCategories}
+                    className="flex items-center w-full py-2 text-gray-700 hover:text-pink-600 transition-colors"
+                  >
+                    <span>Categories</span>
+                    <ChevronDown className={`h-4 w-4 ml-1 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  <div 
+                    className={`pl-4 ${isCategoriesOpen ? 'block' : 'hidden'}`}
+                  >
+                    {categories.map((category) => (
+                      <a
+                        key={category.href}
+                        href={category.href}
+                        className="block py-2 text-gray-700 hover:text-pink-600 transition-colors"
+                      >
+                        {category.name}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+                
                 <a href="#products" className="block py-2 text-gray-700 hover:text-pink-600 transition-colors">Products</a>
                 <a href="#about" className="block py-2 text-gray-700 hover:text-pink-600 transition-colors">About</a>
                 <a href="#gallery" className="block py-2 text-gray-700 hover:text-pink-600 transition-colors">Gallery</a>

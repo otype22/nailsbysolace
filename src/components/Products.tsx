@@ -1,75 +1,152 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, ShoppingCart, Eye } from 'lucide-react';
-import { useCart, Product } from '../context/CartContext';
+import { useCart } from '../context/CartContext';
 import ProductModal from './ProductModal';
+
+export type Product = {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  images: string[];
+  type: string;
+  size: string;
+  ingredients: string;
+  duration: string;
+  rating: number;
+  reviews: number;
+};
+
+const generateCategoryProducts = (category: any, productCount: number) => {
+  return Array.from({ length: productCount }, (_, i) => {
+    const productNumber = i + 1;
+    return {
+      id: parseInt(`${category.prefix.charCodeAt(0)}${productNumber}`),
+      name: `${category.name.split(' ')[0]} Product ${productNumber}`,
+      description: `Premium ${category.type.toLowerCase()} product with amazing features`,
+      price: 5000 + (productNumber * 1000),
+      image: `/assets/img/${category.prefix}${productNumber}.jpeg`,
+      images: [
+        `/assets/img/${category.prefix}${productNumber}.jpeg`,
+        `/assets/img/${category.prefix}${productNumber}-2.jpeg`,
+        `/assets/img/${category.prefix}${productNumber}-3.jpeg`
+      ],
+      type: category.type,
+      size: `${productNumber * 2} pieces`,
+      ingredients: "High-quality materials",
+      duration: productNumber % 2 === 0 ? "4 weeks" : "2 months",
+      rating: 4 + (productNumber * 0.1) % 1,
+      reviews: productNumber * 10
+    };
+  });
+};
+
+const generateAllCategories = () => {
+  const PRODUCTS_PER_CATEGORY = 2;
+  const CATEGORIES = [
+    { name: "Gel Polish Collection", prefix: 'd', type: "Gel Polish" },
+    { name: "Nail Art Collection", prefix: 'a', type: "Nail Art" },
+    { name: "Professional Tools", prefix: 'b', type: "Nail Tools" }
+  ];
+
+  return CATEGORIES.map(category => ({
+    name: category.name,
+    products: generateCategoryProducts(category, PRODUCTS_PER_CATEGORY)
+  }));
+};
+
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency: 'NGN',
+    minimumFractionDigits: 0,
+  }).format(price).replace('NGN', '₦');
+};
+
+const ProductCard = ({ 
+  product,
+  onProductClick,
+  onAddToCart 
+}: {
+  product: Product;
+  onProductClick: (product: Product) => void;
+  onAddToCart: (product: Product, e: React.MouseEvent) => void;
+}) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onProductClick(product);
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+      <button
+        className="w-full text-left focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50"
+        onClick={() => onProductClick(product)}
+        onKeyDown={handleKeyDown}
+        aria-label={`View details for ${product.name}`}
+      >
+        <div className="relative">
+          <img 
+            src={product.image} 
+            alt={product.name}
+            className="w-full h-48 object-cover"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = '/assets/img/naills.jpeg';
+            }}
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
+            <Eye className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </div>
+        </div>
+        
+        <div className="p-4">
+          <h3 className="font-semibold text-lg text-gray-800 mb-1 truncate">{product.name}</h3>
+          <p className="text-gray-600 text-sm mb-2 line-clamp-2">{product.description}</p>
+          
+          <div className="flex items-center mb-2">
+            <div className="flex items-center">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star 
+                  key={`${product.id}-star-${star}`} 
+                  className={`h-3 w-3 ${star <= Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                />
+              ))}
+            </div>
+            <span className="text-xs text-gray-600 ml-1">({product.reviews})</span>
+          </div>
+          
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-lg font-bold text-pink-600">
+              {formatPrice(product.price)}
+            </div>
+          </div>
+        </div>
+      </button>
+      
+      <button
+        onClick={(e) => onAddToCart(product, e)}
+        className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-3 rounded-full hover:from-pink-600 hover:to-purple-600 transition-all duration-300 flex items-center justify-center space-x-1 text-sm mx-4 mb-4"
+      >
+        <ShoppingCart className="h-3 w-3" />
+        <span>Add to Cart</span>
+      </button>
+    </div>
+  );
+};
 
 const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [categories, setCategories] = useState<{name: string, products: Product[]}[]>([]);
   const { dispatch } = useCart();
 
-  const products: Product[] = [
-    {
-      id: 1,
-      name: "Gel Nail Polish Set",
-      description: "Premium long-lasting gel polish set with 6 vibrant colors and top coat",
-      price: 12500,
-      image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&w=500",
-      type: "Gel Polish",
-      size: "6 x 10ml",
-      ingredients: "Non-toxic, vegan formula",
-      duration: "3 weeks",
-      rating: 4.7,
-      reviews: 128
-    },
-    {
-      id: 2,
-      name: "Nail Art Stickers Pack",
-      description: "100 unique nail art stickers for creative designs",
-      price: 4500,
-      image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&w=500",
-      type: "Decals",
-      size: "100 pieces",
-      ingredients: "Waterproof adhesive",
-      duration: "N/A",
-      rating: 4.3,
-      reviews: 76
-    },
-    {
-      id: 3,
-      name: "Professional Nail Kit",
-      description: "Complete nail care kit with tools, files, and buffers",
-      price: 18900,
-      image: "https://www.ubuy.ge/productimg/?image=aHR0cHM6Ly9tLm1lZGlhLWFtYXpvbi5jb20vaW1hZ2VzL0kvNjE4b2lJTE93ckwuX1NMMTA2M18uanBn.jpg",
-      type: "Tool Set",
-      size: "25 pieces",
-      ingredients: "Stainless steel",
-      duration: "Lifetime",
-      rating: 4.9,
-      reviews: 215
-    },
-    {
-      id: 4,
-      name: "Nail Strengthener Serum",
-      description: "Advanced formula to strengthen and repair brittle nails",
-      price: 8500,
-      image: "https://media.glamour.com/photos/6697b5d98fb9df6712f2bb2d/1:1/w_2000,h_2000,c_limit/GL_11-Best-Nail-Strengtheners.jpg",
-      type: "Treatment",
-      size: "15ml",
-      ingredients: "Biotin, Keratin, Vitamins",
-      duration: "2 months",
-      rating: 4.5,
-      reviews: 92
-    }
-  ];
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-      minimumFractionDigits: 0,
-    }).format(price).replace('NGN', '₦');
-  };
+  useEffect(() => {
+    setCategories(generateAllCategories());
+  }, []);
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
@@ -87,72 +164,29 @@ const Products = () => {
       <section id="products" className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Our Premium Products</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Our Premium Collections</h2>
             <p className="text-gray-600 text-lg">
-              Discover our collection of high-quality nail products that will elevate your nail game
+              Explore our extensive range of nail products
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {products.map((product) => (
-              <button
-                key={product.id}
-                type="button"
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer transform hover:scale-105 text-left"
-                onClick={() => handleProductClick(product)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleProductClick(product);
-                  }
-                }}
-              >
-                <div className="relative">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+          {categories.map((category) => (
+            <section key={category.name} className="mb-20">
+              <h3 className="text-2xl font-bold text-gray-800 mb-8 pb-2 border-b border-pink-200">
+                {category.name} ({category.products.length} products)
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+                {category.products.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onProductClick={handleProductClick}
+                    onAddToCart={handleAddToCart}
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                    <Eye className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </div>
-                  <span className="absolute top-3 left-3 bg-pink-500 text-white px-2 py-1 text-xs font-semibold rounded-full">
-                    Popular
-                  </span>
-                </div>
-                
-                <div className="p-6">
-                  <h3 className="font-semibold text-gray-800 mb-2">{product.name}</h3>
-                  
-                  <div className="flex items-center mb-3">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={`${product.id}-star-${i}`} 
-                          className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-600 ml-2">({product.reviews})</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-xl font-bold text-pink-600">
-                      {formatPrice(product.price)}
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={(e) => handleAddToCart(product, e)}
-                    className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 px-4 rounded-full hover:from-pink-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
-                  >
-                    <ShoppingCart className="h-4 w-4" />
-                    <span>Add to Cart</span>
-                  </button>
-                </div>
-              </button>
-            ))}
-          </div>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
       </section>
 

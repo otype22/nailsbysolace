@@ -1,5 +1,4 @@
-import React from 'react';
-import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock,  InstagramIcon, Twitter, Youtube, FacebookIcon } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -34,16 +33,16 @@ const Footer = () => {
               Transform your nails into works of art with our professional nail care services and creative designs.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="bg-gray-800 p-3 rounded-full hover:bg-pink-600 transition-colors">
-                <Facebook className="h-5 w-5" />
+              <a href="https://facebook.com" target="_Adaeze Emmanuel" rel="noopener noreferrer" aria-label="Facebook" className="bg-gray-800 p-3 rounded-full hover:bg-pink-600 transition-colors">
+                <FacebookIcon className="h-5 w-5" />
               </a>
-              <a href="#" className="bg-gray-800 p-3 rounded-full hover:bg-pink-600 transition-colors">
-                <Instagram className="h-5 w-5" />
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="bg-gray-800 p-3 rounded-full hover:bg-pink-600 transition-colors">
+                <InstagramIcon className="h-5 w-5" />
               </a>
-              <a href="#" className="bg-gray-800 p-3 rounded-full hover:bg-pink-600 transition-colors">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="bg-gray-800 p-3 rounded-full hover:bg-pink-600 transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="bg-gray-800 p-3 rounded-full hover:bg-pink-600 transition-colors">
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="Youtube" className="bg-gray-800 p-3 rounded-full hover:bg-pink-600 transition-colors">
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
@@ -82,8 +81,8 @@ const Footer = () => {
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-pink-400 mt-1" />
                 <div>
-                  <p className="text-gray-400">123 Beauty Street</p>
-                  <p className="text-gray-400">Lagos, Nigeria</p>
+                  <p className="text-gray-400">nails by Solace</p>
+                  <p className="text-gray-400">ebelu Port Harcourt, Nigeria</p>
                 </div>
               </div>
               
@@ -94,14 +93,14 @@ const Footer = () => {
               
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-pink-400" />
-                <p className="text-gray-400">info@nailsbysolace.com</p>
+                <p className="text-gray-400"></p>
               </div>
               
               <div className="flex items-start space-x-3">
                 <Clock className="h-5 w-5 text-pink-400 mt-1" />
                 <div>
-                  <p className="text-gray-400">Mon - Fri: 9:00 AM - 7:00 PM</p>
-                  <p className="text-gray-400">Sat - Sun: 10:00 AM - 6:00 PM</p>
+                  <p className="text-gray-400">Mon - Sat: 8:00 AM - 7:00 PM</p>
+                  <p className="text-gray-400"> Sun: 12:00 AM - 6:00 PM</p>
                 </div>
               </div>
             </div>

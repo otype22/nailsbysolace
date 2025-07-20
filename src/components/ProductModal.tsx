@@ -58,19 +58,19 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
             <div className="p-8">
               <h2 className="text-3xl font-bold text-gray-800 mb-4">{product.name}</h2>
               
-              <div className="flex items-center mb-4">
-                <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-5 w-5 ${
-                        i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className="text-gray-600 ml-2">({product.reviews} reviews)</span>
-              </div>
+             <div className="flex items-center mb-4">
+  <div className="flex items-center">
+    {[...Array(5)].map((_, i) => (
+      <Star
+        key={`${product.id}-star-${i}`}  // Unique key combining product ID and star position
+        className={`h-5 w-5 ${
+          i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
+        }`}
+      />
+    ))}
+  </div>
+  <span className="text-gray-600 ml-2">({product.reviews} reviews)</span>
+</div>
               
               <div className="text-3xl font-bold text-pink-600 mb-6">
                 {formatPrice(product.price)}

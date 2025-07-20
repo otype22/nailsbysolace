@@ -24,8 +24,8 @@ const Hero = () => {
           <div className="lg:w-1/2">
             <div className="relative">
               <img 
-                src="https://m.media-amazon.com/images/I/71zqQ589vNS._SL1500_.jpg" 
-                alt="Beautiful nail art" 
+                src="/assets/img/naills.jpeg" 
+                alt="" 
                 className="w-full h-96 object-cover rounded-2xl shadow-2xl"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
